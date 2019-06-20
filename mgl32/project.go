@@ -22,12 +22,22 @@ func Ortho2D(left, right, bottom, top float32) Mat4 {
 	return Ortho(left, right, bottom, top, -1, 1)
 }
 
-// Perspective generates a Perspective Matrix.
+// Perspective generates an OpenGL (left-hand coordinates, normalized -1 to 1
+// depth coordinates) Perspective Matrix.
 func Perspective(fovy, aspect, near, far float32) Mat4 {
 	// fovy = (fovy * math.Pi) / 180.0 // convert from degrees to radians
 	nmf, f := near-far, float32(1./math.Tan(float64(fovy)/2.0))
 
 	return Mat4{float32(f / aspect), 0, 0, 0, 0, float32(f), 0, 0, 0, 0, float32((near + far) / nmf), -1, 0, 0, float32((2. * far * near) / nmf), 0}
+}
+
+// PerspectiveVk generates a Vulkan/Direct3D (right-hand coordinates, normalized
+// 0 to 1 depth coordinates) Perspective Matrix.
+func PerspectiveVk(fovy, aspect, near, far float32) Mat4 {
+	// fovy = (fovy * math.Pi) / 180.0 // convert from degrees to radians
+	f := float32(1. / math.Tan(float64(fovy)/2.0))
+
+	return Mat4{float32(f / aspect), 0, 0, 0, 0, float32(f), 0, 0, 0, 0, float32(far / (near - far)), -1, 0, 0, -float32((far * near) / (far - near)), 0}
 }
 
 // Frustum generates a Frustum Matrix.
